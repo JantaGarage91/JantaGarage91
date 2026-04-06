@@ -167,7 +167,12 @@ export default function BookingPage() {
     try {
       const payload = {
         bookingId,
-        user: { name: user.name, email: user.email },
+        user: { 
+          name: user.name, 
+          email: user.email, 
+          aadhaarUrl: user.aadhaarUrl || "", 
+          dlUrl: user.dlUrl || "" 
+        },
         bike: { 
           bikeId: bike._id || bike.id, 
           name: bike.name, 

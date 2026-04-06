@@ -17,10 +17,13 @@ import {
   UserPlus,
   Loader2,
   PieChart as PieChartIcon,
-  Activity
+  Activity,
+  ShieldCheck as ShieldIcon,
+  FileText
 } from "lucide-react";
 import Link from "next/link";
 import AdminSidebar from "@/components/AdminSidebar";
+import BookingDetailModal from "@/components/BookingDetailModal";
 import { 
   BarChart, 
   Bar, 
@@ -43,6 +46,8 @@ export default function AdminDashboard() {
   const [bikes, setBikes] = useState<any[]>([]);
   const [inquiries, setInquiries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedBooking, setSelectedBooking] = useState<any>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -117,25 +122,25 @@ export default function AdminDashboard() {
   const availableBikes = bikes.filter(b => b.status === "AVAILABLE").length;
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-100 flex flex-col lg:flex-row overflow-hidden">
+    <div className="min-h-screen bg-[#020617] text-slate-100 flex flex-col lg:flex-row overflow-hidden font-sansSelection">
       <AdminSidebar />
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto p-6 pt-24 lg:p-12 lg:pt-12">
+      <main className="flex-1 overflow-y-auto p-6 pt-16 lg:p-12 lg:pt-12">
          {/* Top Header */}
          <div className="flex justify-between items-center mb-12">
             <div className="space-y-1">
-              <h1 className="text-3xl font-black uppercase tracking-tighter">OPERATIONS CONSOLE</h1>
+              <h1 className="text-3xl font-black uppercase tracking-tighter text-white">OPERATIONS CONSOLE</h1>
               <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Global Overview • {new Date().toLocaleDateString()}</p>
             </div>
             
             <div className="flex items-center gap-6">
                <div className="text-right">
-                  <div className="text-[10px] font-black uppercase tracking-widest text-white">{user.name}</div>
+                  <div className="text-[10px] font-black uppercase tracking-widest text-[#ffc800]">{user.name}</div>
                   <div className="text-[9px] font-black uppercase tracking-widest text-blue-500">{user.role} PRIVILEGE</div>
                </div>
-               <div className="w-12 h-12 bg-slate-800 border border-slate-700 rounded-xl flex items-center justify-center">
-                  <span className="font-black text-xs text-white">{user.name.charAt(0)}</span>
+               <div className="w-12 h-12 bg-white/5 border border-white/10 rounded-none flex items-center justify-center -skew-x-12">
+                  <span className="font-black text-xs text-white skew-x-12">{user.name.charAt(0)}</span>
                </div>
             </div>
          </div>
@@ -144,19 +149,19 @@ export default function AdminDashboard() {
          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
             {[
               { label: "Bookings Processed", val: bookings.length.toString(), trend: "+12.5%", icon: Calendar, color: "text-blue-500" },
-              { label: "Total Revenue", val: `₹${calculateTotalRevenue().toLocaleString()}`, trend: "+24.2%", icon: TrendingUp, color: "text-green-500" },
-              { label: "Fleet Inventory", val: `${bikes.length}`, trend: `${availableBikes} Available`, icon: Bike, color: "text-indigo-500" },
-              { label: "Open Inquiries", val: pendingInquiries.toString().padStart(2, '0'), trend: "Needs Action", icon: MessageSquare, color: "text-red-500" }
+              { label: "Total Transactions", val: `₹${calculateTotalRevenue().toLocaleString()}`, trend: "+24.2%", icon: TrendingUp, color: "text-emerald-500" },
+              { label: "Fleet Inventory", val: `${bikes.length}`, trend: `${availableBikes} Active`, icon: Bike, color: "text-indigo-500" },
+              { label: "Field Inquiries", val: pendingInquiries.toString().padStart(2, '0'), trend: "Needs Action", icon: MessageSquare, color: "text-red-500" }
             ].map((stat, i) => (
-              <div key={i} className="bg-slate-900/50 border border-slate-800 p-8 space-y-4 hover:border-blue-500/50 transition-all cursor-default relative group overflow-hidden">
+              <div key={i} className="bg-white/5 border border-white/5 p-8 space-y-4 hover:border-[#ffc800]/50 hover:bg-white/10 transition-all cursor-default relative group overflow-hidden">
                  <div className="absolute top-0 right-0 p-4 opacity-[0.05] group-hover:opacity-[0.15] transition-opacity">
-                    <stat.icon className="w-16 h-16" />
+                    <stat.icon className="w-16 h-16 text-white" />
                  </div>
                  <div className="flex justify-between items-center relative z-10">
                     <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.25em]">{stat.label}</span>
-                    <span className={`text-[9px] font-black ${stat.trend.startsWith('+') ? 'text-green-500' : 'text-red-500'}`}>{stat.trend}</span>
+                    <span className={`text-[9px] font-black ${stat.trend.startsWith('+') || stat.trend.includes('Active') ? 'text-emerald-500' : 'text-red-500'}`}>{stat.trend}</span>
                  </div>
-                 <div className="text-4xl font-black uppercase tracking-tighter relative z-10">{stat.val}</div>
+                 <div className="text-4xl font-black uppercase tracking-tighter relative z-10 text-white italic">{stat.val}</div>
               </div>
             ))}
          </div>
@@ -164,11 +169,11 @@ export default function AdminDashboard() {
          {/* Visualizations */}
          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
             {/* Revenue Trend Chart */}
-            <div className="bg-[#0f172a] border border-slate-800 p-6 rounded-none">
-              <div className="flex justify-between items-center mb-8 border-b border-slate-800 pb-4">
+            <div className="bg-[#050a15] border border-white/5 p-6 rounded-none">
+              <div className="flex justify-between items-center mb-8 border-b border-white/5 pb-4">
                 <div className="flex items-center gap-2">
                   <Activity className="w-4 h-4 text-blue-500" />
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em]">Revenue Velocity</h3>
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-white">Revenue Velocity</h3>
                 </div>
               </div>
               <div className="h-64 mt-4">
@@ -212,11 +217,11 @@ export default function AdminDashboard() {
             </div>
 
             {/* Vehicle Preference Pie Chart */}
-            <div className="bg-[#0f172a] border border-slate-800 p-6 rounded-none">
-              <div className="flex justify-between items-center mb-8 border-b border-slate-800 pb-4">
+            <div className="bg-[#050a15] border border-white/5 p-6 rounded-none">
+              <div className="flex justify-between items-center mb-8 border-b border-white/5 pb-4">
                 <div className="flex items-center gap-2">
                   <PieChartIcon className="w-4 h-4 text-indigo-500" />
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em]">Fleet Distribution</h3>
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-white">Fleet Distribution</h3>
                 </div>
               </div>
               <div className="h-64 mt-4">
@@ -257,44 +262,58 @@ export default function AdminDashboard() {
 
          {/* Activity Grid */}
          <div className="grid grid-cols-1 gap-8">
-            <div className="bg-[#0f172a] border border-slate-800">
-               <div className="p-6 border-b border-slate-800 flex justify-between items-center">
-                  <h3 className="text-[10px] font-black uppercase tracking-widest">Global Booking Inventory</h3>
-                  <button onClick={fetchAllData} className="text-[10px] font-black uppercase text-blue-500 hover:underline">Synchronize Records</button>
+            <div className="bg-[#050a15] border border-white/5">
+               <div className="p-6 border-b border-white/5 flex justify-between items-center bg-slate-900/40">
+                  <h3 className="text-[10px] font-black uppercase tracking-widest text-[#ffc800]">Global Booking Inventory</h3>
+                  <button onClick={fetchAllData} className="text-[10px] font-black px-3 py-1.5 uppercase bg-white/5 border border-white/10 hover:bg-[#ffc800] hover:text-black transition-all">Synchronize Records</button>
                </div>
-               <div className="p-8">
+               <div className="p-8 font-sans">
                   {loading ? (
                     <div className="h-64 flex flex-col items-center justify-center gap-4">
-                       <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
-                       <span className="text-[10px] font-black uppercase tracking-widest text-slate-600">Retrieving Secure Data...</span>
+                       <div className="w-8 h-8 border-4 border-slate-800 border-t-white rounded-full animate-spin"></div>
+                       <span className="text-[10px] font-black uppercase tracking-widest text-slate-600">Retrieving Operational Data...</span>
                     </div>
                   ) : bookings.length === 0 ? (
-                    <div className="w-full h-80 border border-dashed border-slate-800 rounded-none flex items-center justify-center text-slate-700 font-black text-[10px] uppercase tracking-[0.5em]">
+                    <div className="w-full h-80 border border-dashed border-white/5 rounded-none flex items-center justify-center text-slate-700 font-black text-[10px] uppercase tracking-[0.5em]">
                        No Transactional Data Found
                     </div>
                   ) : (
                     <div className="overflow-x-auto">
-                      <table className="w-full text-left border-collapse">
+                      <table className="w-full text-left border-collapse min-w-[800px]">
                          <thead>
-                            <tr className="bg-slate-950/50 text-slate-500 text-[8px] font-black uppercase tracking-[0.2em] border-b border-slate-800">
-                               <th className="py-4 px-6">Identity</th>
-                               <th className="py-4 px-6">Vehicle</th>
+                            <tr className="bg-black/50 text-slate-500 text-[8px] font-black uppercase tracking-[0.2em] border-b border-white/5">
+                               <th className="py-4 px-6">Identity / Manifest</th>
+                               <th className="py-4 px-6">Assigned Unit</th>
                                <th className="py-4 px-6">Timeline</th>
-                               <th className="py-4 px-6 text-right">Revenue</th>
+                               <th className="py-4 px-6">Revenue</th>
+                               <th className="py-4 px-6 text-right">Actions</th>
                             </tr>
                          </thead>
-                         <tbody className="text-[10px] font-black uppercase tracking-widest transition-colors">
+                         <tbody className="text-[10px] font-black uppercase tracking-[0.1em] transition-colors">
                             {bookings.map((b, i) => (
-                               <tr key={i} className="border-b border-slate-800/50 hover:bg-white/5 transition-colors group">
+                               <tr key={i} className="border-b border-white/5 hover:bg-white/5 transition-colors group">
                                   <td className="py-4 px-6">
                                      <div className="flex flex-col">
-                                        <span className="text-white group-hover:text-blue-400 transition-colors">{b.user?.name}</span>
-                                        <span className="text-[8px] text-slate-600 lowercase tracking-normal mt-1">{b.bookingId}</span>
+                                        <span className="text-white group-hover:text-[#ffc800] transition-colors uppercase italic">{b.user?.name}</span>
+                                        <span className="text-[8px] text-slate-600 font-mono tracking-normal mt-1 italic">ID_{b.bookingId}</span>
                                      </div>
                                   </td>
-                                  <td className="py-4 px-6 italic text-slate-400">{b.bike?.name}</td>
-                                  <td className="py-4 px-6 text-slate-500">{b.pickupDate}</td>
-                                  <td className="py-4 px-6 text-right text-[#ffc800]">₹{b.totalPrice}</td>
+                                  <td className="py-4 px-6 italic text-slate-300">{b.bike?.name}</td>
+                                  <td className="py-4 px-6 text-slate-400 italic">
+                                     <span className="text-white">{b.pickupDate}</span>
+                                  </td>
+                                  <td className="py-4 px-6 text-[#ffc800] italic font-black">₹{b.totalPrice?.toLocaleString()}</td>
+                                  <td className="py-4 px-6 text-right">
+                                     <button 
+                                        onClick={() => {
+                                          setSelectedBooking(b);
+                                          setIsDetailModalOpen(true);
+                                        }}
+                                        className="px-4 py-2 bg-[#ffc800]/10 text-[#ffc800] border border-[#ffc800]/20 text-[8px] font-black uppercase hover:bg-[#ffc800] hover:text-black hover:border-[#ffc800] transition-all"
+                                     >
+                                        VIEW FULL DETAILS
+                                     </button>
+                                  </td>
                                 </tr>
                             ))}
                          </tbody>
@@ -305,6 +324,12 @@ export default function AdminDashboard() {
             </div>
          </div>
       </main>
+
+      <BookingDetailModal 
+        isOpen={isDetailModalOpen} 
+        onClose={() => setIsDetailModalOpen(false)} 
+        booking={selectedBooking} 
+      />
     </div>
   );
 }

@@ -5,6 +5,8 @@ export interface IBookingDoc extends Document {
   user: {
     name: string;
     email: string;
+    aadhaarUrl?: string;
+    dlUrl?: string;
   };
   bike: {
     bikeId: string;
@@ -26,6 +28,8 @@ const BookingSchema = new Schema<IBookingDoc>(
     user: {
       name: { type: String, required: true },
       email: { type: String, required: true },
+      aadhaarUrl: { type: String, required: false },
+      dlUrl: { type: String, required: false },
     },
     bike: {
       bikeId: { type: Schema.Types.ObjectId, ref: "Bike", required: true },
