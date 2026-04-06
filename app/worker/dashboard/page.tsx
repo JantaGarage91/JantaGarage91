@@ -11,7 +11,9 @@ import {
   CheckCircle2,
   AlertTriangle,
   User,
-  Settings
+  Settings,
+  Menu,
+  X as CloseIcon
 } from "lucide-react";
 
 export default function WorkerDashboard() {
@@ -21,6 +23,7 @@ export default function WorkerDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeView, setActiveView] = useState<"HUB" | "INVENTORY">("HUB");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -88,9 +91,17 @@ export default function WorkerDashboard() {
 
   return (
     <div className="min-h-screen bg-[#020617] text-slate-100 flex overflow-hidden font-sansSelection">
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 z-[60] lg:hidden backdrop-blur-sm"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 bg-[#050a15] border-r border-emerald-500/10 flex flex-col hidden lg:flex">
-         <div className="p-8 border-b border-emerald-500/10 flex items-center justify-center">
+      <aside className={`fixed lg:static inset-y-0 left-0 w-72 bg-[#050a15] border-r border-emerald-500/10 flex flex-col z-[70] transition-transform duration-300 lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+         <div className="p-8 border-b border-emerald-500/10 flex items-center justify-between">
             <div className="flex items-center gap-3 bg-[#1e293b] p-2 -skew-x-12 border border-white/5">
                 <div className="skew-x-12 w-6 h-6 bg-emerald-500 rounded flex items-center justify-center">
                     <Wrench className="w-3 h-3 text-black" />
@@ -99,6 +110,9 @@ export default function WorkerDashboard() {
                     STAFF<span className="text-emerald-500">PRO</span>
                 </span>
             </div>
+            <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-slate-500 hover:text-white">
+              <CloseIcon className="w-5 h-5" />
+            </button>
          </div>
          
          <nav className="flex-1 p-6 space-y-2">
@@ -108,7 +122,10 @@ export default function WorkerDashboard() {
             ].map((item) => (
               <button 
                 key={item.id} 
-                onClick={() => setActiveView(item.id as any)}
+                onClick={() => {
+                  setActiveView(item.id as any);
+                  setIsSidebarOpen(false);
+                }}
                 className={`w-full flex items-center gap-4 px-4 py-3.5 text-[10px] font-black uppercase tracking-widest transition-all ${
                   activeView === item.id ? "bg-emerald-500 text-black translate-x-1 shadow-[0_0_20px_rgba(16,185,129,0.2)]" : "text-slate-500 hover:text-white"
                 }`}
@@ -134,11 +151,26 @@ export default function WorkerDashboard() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto p-12">
+      <main className="flex-1 overflow-y-auto px-6 py-10 md:p-12 w-full pt-20 lg:pt-12">
+         {/* Mobile Header Toggle */}
+         <div className="lg:hidden fixed top-0 left-0 right-0 bg-[#050a15] border-b border-emerald-500/10 p-4 flex items-center justify-between z-50">
+            <div className="flex items-center gap-3 bg-[#1e293b] p-2 -skew-x-12 border border-white/5">
+                <div className="skew-x-12 w-6 h-6 bg-emerald-500 rounded flex items-center justify-center">
+                    <Wrench className="w-3 h-3 text-black" />
+                </div>
+                <span className="skew-x-12 text-xs font-black italic tracking-tighter uppercase text-white">
+                    STAFF<span className="text-emerald-500">PRO</span>
+                </span>
+            </div>
+            <button onClick={() => setIsSidebarOpen(true)} className="p-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-emerald-500">
+               <Menu className="w-5 h-5" />
+            </button>
+         </div>
+
          {/* Error Context Board */}
          {error && (
-            <div className="mb-10 p-6 bg-red-500/10 border-2 border-red-500/20 flex items-center justify-between text-red-500 rounded-none animate-in fade-in slide-in-from-top-4">
-               <div className="flex items-center gap-4">
+            <div className="mb-10 p-6 bg-red-500/10 border-2 border-red-500/20 flex flex-col md:flex-row items-center justify-between text-red-500 rounded-none animate-in fade-in slide-in-from-top-4 gap-4">
+               <div className="flex items-center gap-4 text-center md:text-left">
                   <AlertTriangle className="w-6 h-6 animate-pulse" />
                   <div>
                      <div className="text-[10px] font-black uppercase tracking-[0.3em] overflow-hidden">Critical Error Matrix</div>
@@ -147,7 +179,7 @@ export default function WorkerDashboard() {
                </div>
                <button 
                   onClick={loadDashboardData}
-                  className="px-6 py-2 bg-red-500 text-black text-[9px] font-black uppercase tracking-widest hover:bg-white transition-colors"
+                  className="w-full md:w-auto px-6 py-2 bg-red-500 text-black text-[9px] font-black uppercase tracking-widest hover:bg-white transition-colors"
                >
                   Retry Override
                </button>
@@ -155,25 +187,25 @@ export default function WorkerDashboard() {
          )}
          
          {/* Top Header */}
-         <div className="flex justify-between items-center mb-12">
+         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
             <div className="space-y-1">
-              <h1 className="text-3xl font-black uppercase tracking-tighter italic">
+              <h1 className="text-2xl md:text-3xl font-black uppercase tracking-tighter italic">
                 {activeView === "HUB" ? "STAFF " : "FLEET "}
                 <span className="text-emerald-500">{activeView === "HUB" ? "REGISTRY" : "INVENTORY"}</span>
               </h1>
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+              <p className="text-[9px] md:text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
                 <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
                 Access: WORKER_{worker.workerId} • View: {activeView}
               </p>
             </div>
             
-            <div className="flex items-center gap-6">
-               <div className="text-right">
-                  <div className="text-[10px] font-black uppercase tracking-widest text-white">{worker.name}</div>
-                  <div className="text-[9px] font-black uppercase tracking-widest text-emerald-500">OPERATIONAL STATUS: READY</div>
+            <div className="flex items-center gap-4 md:gap-6 bg-white/5 p-3 md:bg-transparent md:p-0 w-full md:w-auto rounded-xl">
+               <div className="text-left md:text-right flex-1">
+                  <div className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-white">{worker.name}</div>
+                  <div className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-emerald-500">OPERATIONAL STATUS: READY</div>
                </div>
-               <div className="w-12 h-12 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center justify-center">
-                  <User className="w-5 h-5 text-emerald-500" />
+               <div className="w-10 h-10 md:w-12 md:h-12 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center justify-center">
+                  <User className="w-4 h-4 md:w-5 md:h-5 text-emerald-500" />
                </div>
             </div>
          </div>

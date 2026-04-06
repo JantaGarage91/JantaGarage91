@@ -48,16 +48,15 @@ const reviews = [
 
 export default function ReviewsSlider() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
-
+  
   // Robust auto-shuffle effect
   useEffect(() => {
     const timer = setTimeout(() => {
       setCurrentIndex((prev) => (prev + 1) % reviews.length);
-    }, 4500); // Automatically rotates every 4.5 seconds
+    }, 4500); 
     
     return () => clearTimeout(timer);
-  }, [currentIndex]); // Depends on currentIndex so it resets on manual click
+  }, [currentIndex]);
 
   const handleNext = () => {
     setCurrentIndex((prev) => (prev + 1) % reviews.length);
@@ -68,12 +67,12 @@ export default function ReviewsSlider() {
   };
 
   return (
-    <section id="reviews-section" className="bg-white py-24 px-6 relative overflow-hidden border-t border-slate-100">
+    <section id="reviews-section" className="bg-white py-16 md:py-24 px-6 relative overflow-hidden border-t border-slate-100">
       {/* Subtle Background Pattern */}
       <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[radial-gradient(#000_1.5px,transparent_1.5px)] [background-size:28px_28px]"></div>
 
       <div className="max-w-6xl mx-auto relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center lg:px-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center lg:px-12">
           
           {/* Left Side: Engaging Text & Trust Badges */}
           <div className="flex flex-col items-start space-y-6">
@@ -83,23 +82,23 @@ export default function ReviewsSlider() {
             <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-slate-900 leading-[0.9]">
               Millions of  <br /> <span className="text-[#ffc800]">Miles Driven.</span>
             </h2>
-            <p className="text-slate-500 text-lg font-medium max-w-md pb-4 pt-2">
+            <p className="text-slate-500 text-base md:text-lg font-medium max-w-md pb-4 pt-2">
               We aren&apos;t just renting out bikes; we are fueling adventures. Read what our passionate community of riders has to say about the Rentrip experience.
             </p>
             
             <div className="flex flex-wrap gap-6 pt-4 border-t border-slate-100 w-full">
                <div className="space-y-1">
-                 <div className="text-3xl font-black text-slate-900">4.9/5</div>
+                 <div className="text-2xl md:text-3xl font-black text-slate-900">4.9/5</div>
                  <div className="text-[10px] font-black uppercase tracking-widest text-[#ffc800]">Average Rating</div>
                </div>
                <div className="w-px h-12 bg-slate-200 hidden md:block"></div>
                <div className="space-y-1">
-                 <div className="text-3xl font-black text-slate-900">10k+</div>
+                 <div className="text-2xl md:text-3xl font-black text-slate-900">10k+</div>
                  <div className="text-[10px] font-black uppercase tracking-widest text-blue-500">Happy Riders</div>
                </div>
                <div className="w-px h-12 bg-slate-200 hidden md:block"></div>
                <div className="space-y-1">
-                 <div className="text-3xl font-black text-slate-900">99%</div>
+                 <div className="text-2xl md:text-3xl font-black text-slate-900">99%</div>
                  <div className="text-[10px] font-black uppercase tracking-widest text-green-500">Refund Rate</div>
                </div>
             </div>
@@ -107,13 +106,13 @@ export default function ReviewsSlider() {
             <div className="flex gap-4 mt-6">
                <button 
                  onClick={handlePrev}
-                 className="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-lg border border-slate-100 hover:bg-slate-50 hover:scale-110 active:scale-95 transition-all text-slate-600 hover:text-black cursor-pointer"
+                 className="w-12 h-12 md:w-14 md:h-14 bg-white rounded-full flex items-center justify-center shadow-lg border border-slate-100 hover:bg-slate-50 hover:scale-110 active:scale-95 transition-all text-slate-600 hover:text-black cursor-pointer"
                >
                  <ChevronLeft className="w-6 h-6 pr-1" />
                </button>
                <button 
                  onClick={handleNext}
-                 className="w-14 h-14 bg-slate-900 rounded-full flex items-center justify-center shadow-lg border border-slate-800 hover:bg-[#ffc800] hover:text-black active:scale-95 transition-all text-white cursor-pointer"
+                 className="w-12 h-12 md:w-14 md:h-14 bg-slate-900 rounded-full flex items-center justify-center shadow-lg border border-slate-800 hover:bg-[#ffc800] hover:text-black active:scale-95 transition-all text-white cursor-pointer"
                >
                  <ChevronRight className="w-6 h-6 pl-1" />
                </button>
@@ -121,34 +120,28 @@ export default function ReviewsSlider() {
           </div>
 
           {/* Right Side: The Shuffling Deck */}
-          <div className="relative w-full h-[450px] flex items-center justify-end pl-0 md:pl-10">
-             {/* Shuffle Deck Container */}
-             <div className="relative w-full h-[380px] max-w-[500px]">
+          <div className="relative w-full h-[380px] md:h-[450px] flex items-center justify-center lg:justify-end">
+             <div className="relative w-full max-w-[450px] h-[340px] md:h-[380px]">
                {reviews.map((review, index) => {
-                 // Calculate absolute distance from current index moving forward
                  let dist = index - currentIndex;
-                 if (dist < 0) dist += reviews.length; // Wrap around to always get a positive distance
+                 if (dist < 0) dist += reviews.length; 
                  
-                 // Render only the first 3 cards in the stack to prevent visual clutter
                  if (dist > 2) return null;
 
-                 // Stacking properties
                  let zIndex = 10 - dist;
-                 let opacity = 1 - (dist * 0.15); // Front is 1, then 0.85, then 0.70
-                 let scale = 1 - (dist * 0.05);   // Front is 1, then 0.95, then 0.90
+                 let opacity = 1 - (dist * 0.15); 
+                 let scale = 1 - (dist * 0.05);   
                  
-                 // Fan out to the bottom right exactly as shown in the screenshot
-                 let translateX = `${dist * 18}px`; 
-                 let translateY = `${dist * 22}px`;
-                 let rotate = `${dist * 2}deg`; // Rotate 0, 2, 4 degrees
+                 // Reduced translations for cleaner look
+                 let translateX = `${dist * 12}px`; 
+                 let translateY = `${dist * 16}px`;
+                 let rotate = `${dist * 1.5}deg`;
                  
-                 let className = "absolute top-0 left-0 w-full transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] p-8 md:p-10 rounded-[2.5rem] flex flex-col justify-between h-[360px] bg-white";
+                 let className = "absolute top-0 left-0 w-full transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] p-7 md:p-10 rounded-[2.5rem] flex flex-col justify-between h-[320px] md:h-[360px] bg-white";
 
                  if (dist === 0) {
-                   // Active Front Card
                    className += " border-[#ffc800] border-2 shadow-[0_20px_50px_rgba(0,0,0,0.08)] bg-gradient-to-br from-white to-[#ffc800]/5";
                  } else {
-                   // Cards behind
                    className += " border-slate-100 border shadow-md";
                  }
 
@@ -162,31 +155,31 @@ export default function ReviewsSlider() {
                        transform: `translate(${translateX}, ${translateY}) scale(${scale}) rotate(${rotate})`,
                      }}
                    >
-                     {/* Giant Quote Icon */}
-                     <div className="absolute top-8 right-8 scale-[2] origin-top-right opacity-5 font-serif text-8xl text-black leading-none">
+                     {/* Quote Icon - Only on top card */}
+                     <div className={`absolute top-8 right-8 scale-[2] origin-top-right font-serif text-8xl text-black leading-none transition-opacity duration-500 ${dist === 0 ? 'opacity-5' : 'opacity-0'}`}>
                        &quot;
                      </div>
                      
                      {/* Stars */}
-                     <div className="flex gap-1.5 mb-8 z-10 relative">
+                     <div className="flex gap-1.5 mb-6 z-10 relative">
                        {[...Array(review.rating)].map((_, i) => (
-                         <Star key={i} className="w-5 h-5 text-[#ffc800] fill-[#ffc800]" />
+                         <Star key={i} className="w-4 h-4 md:w-5 md:h-5 text-[#ffc800] fill-[#ffc800]" />
                        ))}
                      </div>
                      
                      {/* Review Text */}
-                     <p className="text-slate-800 font-bold leading-relaxed mb-auto z-10 relative text-lg italic">
+                     <p className="text-slate-800 font-bold leading-relaxed mb-auto z-10 relative text-sm md:text-lg italic line-clamp-4 md:line-clamp-none">
                        &quot;{review.text}&quot;
                      </p>
                      
-                     {/* User Profile Info */}
-                     <div className="flex items-center gap-4 z-10 relative mt-6 pt-6">
-                       <div className="w-14 h-14 bg-slate-950 rounded-full flex items-center justify-center font-black text-[#ffc800] text-xl shadow-[0_10px_20px_rgba(0,0,0,0.1)]">
+                     {/* User Profile - Hidden on back cards to prevent text overlap */}
+                     <div className={`flex items-center gap-4 z-10 relative mt-6 pt-6 transition-opacity duration-500 ${dist === 0 ? 'opacity-100' : 'opacity-0'}`}>
+                       <div className="w-10 h-10 md:w-14 md:h-14 bg-slate-950 rounded-full flex items-center justify-center font-black text-[#ffc800] text-sm md:text-xl shadow-[0_10px_20px_rgba(0,0,0,0.1)]">
                          {review.initial}
                        </div>
                        <div>
-                         <h4 className="text-slate-900 font-black uppercase tracking-widest text-xs">{review.name}</h4>
-                         <span className="text-slate-500 font-bold text-[10px] uppercase tracking-widest">{review.role}</span>
+                         <h4 className="text-slate-900 font-black uppercase tracking-widest text-[9px] md:text-xs">{review.name}</h4>
+                         <span className="text-slate-500 font-bold text-[8px] md:text-[10px] uppercase tracking-widest">{review.role}</span>
                        </div>
                      </div>
                    </div>
@@ -197,12 +190,12 @@ export default function ReviewsSlider() {
         </div>
         
         {/* Mobile indicators */}
-        <div className="flex justify-center gap-2 mt-4 md:hidden">
+        <div className="flex justify-center gap-2 mt-8 md:hidden">
           {reviews.map((_, idx) => (
             <div 
               key={idx} 
-              className={`h-1.5 rounded-full transition-all duration-500 ${
-                idx === currentIndex ? "w-8 bg-[#ffc800]" : "w-2 bg-slate-200"
+              className={`h-1 rounded-full transition-all duration-500 ${
+                idx === currentIndex ? "w-6 bg-[#ffc800]" : "w-1.5 bg-slate-200"
               }`}
             />
           ))}

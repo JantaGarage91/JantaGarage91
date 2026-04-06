@@ -11,14 +11,37 @@ import {
   Star,
   Globe
 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState, useRef } from "react";
+import { useRouter, usePathname } from "next/navigation";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+    if (showDropdown) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showDropdown]);
+
+  useEffect(() => {
+    setShowDropdown(false);
+    setShowMobileMenu(false);
+  }, [pathname]);
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,7 +53,12 @@ const Navbar = () => {
     const checkUser = () => {
       const storedUser = localStorage.getItem("user");
       if (storedUser) {
-        setUser(JSON.parse(storedUser));
+        try {
+          setUser(JSON.parse(storedUser));
+        } catch (e) {
+          localStorage.removeItem("user");
+          setUser(null);
+        }
       } else {
         setUser(null);
       }
@@ -124,11 +152,16 @@ const Navbar = () => {
              <div className="absolute inset-0 bg-gradient-to-t from-[#ffc800]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
              H
           </div>
-          <div className="flex flex-col">
+          <div className="flex flex-col hidden sm:flex">
             <span className={`text-2xl font-black italic tracking-tighter uppercase leading-none ${isScrolled ? "text-slate-900" : "text-white"}`}>
               HIMALAYAN <span className="text-[#ffc800]">RIDER</span>
             </span>
             <span className={`text-[8px] font-black uppercase tracking-[0.4em] mt-1 ${isScrolled ? "text-slate-400" : "text-white/40"}`}>Ride your freedom</span>
+          </div>
+          <div className="flex flex-col sm:hidden">
+             <span className={`text-xl font-black italic tracking-tighter uppercase leading-none ${isScrolled ? "text-slate-900" : "text-white"}`}>
+               HR
+             </span>
           </div>
         </Link>
 
@@ -154,7 +187,7 @@ const Navbar = () => {
         {/* CTA - Handled in Top Bar, removed from main glass nav for clean look */}
         <div className="flex items-center space-x-3">
            {user && (
-             <div className="relative">
+             <div className="relative" ref={dropdownRef}>
                <button 
                  onClick={() => setShowDropdown(!showDropdown)}
                  className={`flex items-center gap-3 px-5 py-3 rounded-full transition-all active:scale-95 ${
@@ -167,26 +200,26 @@ const Navbar = () => {
                  <span className="text-[10px] font-black uppercase tracking-widest hidden sm:block">Account</span>
                </button>
                {showDropdown && (
-                 <div className={`absolute top-full right-0 mt-4 w-48 shadow-2xl z-[60] p-1 border animate-in fade-in zoom-in duration-200 ${
+                 <div onClick={() => setShowDropdown(false)} className={`absolute top-full right-0 mt-4 w-48 shadow-2xl z-[60] p-1 border animate-in fade-in zoom-in duration-200 ${
                    isScrolled ? "bg-white border-slate-200" : "bg-[#1e293b] border-white/10"
                  }`}>
                    <div className={`px-4 py-3 border-b ${isScrolled ? "border-slate-100" : "border-white/10"}`}>
                      <div className={`text-[10px] font-black uppercase tracking-tighter ${isScrolled ? "text-slate-900" : "text-white"}`}>{user.name}</div>
                      <div className="text-[8px] font-bold text-slate-500 uppercase tracking-widest mt-1">{user.email}</div>
                    </div>
-                   <Link href="/profile" className={`block px-4 py-3 text-[9px] font-black uppercase tracking-widest transition-colors ${
+                   <Link href="/profile" onClick={() => setShowDropdown(false)} className={`block px-4 py-3 text-[9px] font-black uppercase tracking-widest transition-colors ${
                      isScrolled ? "text-slate-600 hover:bg-slate-50 hover:text-slate-900" : "text-slate-300 hover:bg-white/5 hover:text-[#ffc800]"
                    }`}>
                      Profile Dashboard
                    </Link>
                    {user.role === "ADMIN" && (
-                     <Link href="/admin/dashboard" className={`block px-4 py-3 text-[9px] font-black uppercase tracking-widest transition-colors border-t border-white/5 ${
+                     <Link href="/admin/dashboard" onClick={() => setShowDropdown(false)} className={`block px-4 py-3 text-[9px] font-black uppercase tracking-widest transition-colors border-t border-white/5 ${
                        isScrolled ? "text-blue-600 hover:bg-blue-50" : "text-blue-400 hover:bg-blue-500/10"
                      }`}>
                        Management Console
                      </Link>
                    )}
-                   <Link href="/bookings" className={`block px-4 py-3 text-[9px] font-black uppercase tracking-widest transition-colors ${
+                   <Link href="/bookings" onClick={() => setShowDropdown(false)} className={`block px-4 py-3 text-[9px] font-black uppercase tracking-widest transition-colors ${
                      isScrolled ? "text-slate-600 hover:bg-slate-50 hover:text-slate-900" : "text-slate-300 hover:bg-white/5 hover:text-[#ffc800]"
                    }`}>
                      My Bookings
@@ -198,15 +231,78 @@ const Navbar = () => {
                )}
              </div>
            )}
-           <Link href="/auth/user" className="flex items-center justify-center w-12 h-12 rounded-2xl bg-[#ffc800] text-black hover:bg-white transition-all shadow-xl shadow-yellow-500/20 active:scale-90 lg:hidden">
+           <Link href="/auth/user" className="flex items-center justify-center w-12 h-12 rounded-2xl bg-[#ffc800] text-black hover:bg-white transition-all shadow-xl shadow-yellow-500/20 active:scale-90 lg:hidden hidden">
              {user ? (
                <span className="font-black text-xs uppercase">{user.name.charAt(0)}</span>
              ) : (
                <User className="w-5 h-5" />
              )}
            </Link>
+
+           <button 
+             onClick={() => setShowMobileMenu(!showMobileMenu)}
+             className={`md:hidden flex items-center justify-center w-12 h-12 rounded-2xl transition-all active:scale-95 ${
+               isScrolled ? "bg-slate-100 text-slate-900" : "bg-white/10 text-white border border-white/20"
+             }`}
+           >
+             <Menu className="w-5 h-5" />
+           </button>
         </div>
       </div>
+
+      {/* Mobile Menu Dropdown */}
+      {showMobileMenu && (
+        <div className="md:hidden absolute top-full left-0 w-full bg-[#020617] border-b border-white/10 shadow-2xl animate-in slide-in-from-top-2">
+          <div className="flex flex-col p-6 space-y-4">
+            {[
+              { name: "Home", href: "/" },
+              { name: "Rent Bikes", href: "/rent-bikes" },
+              { name: "About Us", href: "/about-us" },
+              { name: "Support", href: "/support" }
+            ].map((item) => (
+              <Link 
+                key={item.name} 
+                href={item.href} 
+                onClick={() => setShowMobileMenu(false)}
+                className="text-white text-xs font-black uppercase tracking-[0.2em] py-2 border-b border-white/5"
+              >
+                {item.name}
+              </Link>
+            ))}
+            
+            {!user ? (
+               <Link 
+                 href="/auth/user" 
+                 onClick={() => setShowMobileMenu(false)}
+                 className="flex items-center gap-3 text-[#ffc800] text-xs font-black uppercase tracking-[0.2em] py-2"
+               >
+                 <User className="w-4 h-4" />
+                 Login / Register
+               </Link>
+            ) : (
+               <div className="pt-4 mt-2 border-t border-white/10">
+                 <div className="text-[10px] font-black uppercase tracking-tighter text-white mb-4">Account ({user.name})</div>
+                 <div className="space-y-3">
+                   <Link href="/profile" onClick={() => setShowMobileMenu(false)} className="block text-[#ffc800] text-[10px] font-black uppercase tracking-widest">
+                     Profile Dashboard
+                   </Link>
+                   <Link href="/bookings" onClick={() => setShowMobileMenu(false)} className="block text-[#ffc800] text-[10px] font-black uppercase tracking-widest">
+                     My Bookings
+                   </Link>
+                   {user.role === "ADMIN" && (
+                      <Link href="/admin/dashboard" onClick={() => setShowMobileMenu(false)} className="block text-blue-400 text-[10px] font-black uppercase tracking-widest">
+                        Management Console
+                      </Link>
+                   )}
+                   <button onClick={handleLogout} className="text-red-500 text-[10px] font-black uppercase tracking-widest text-left mt-4">
+                     Sign Out
+                   </button>
+                 </div>
+               </div>
+            )}
+          </div>
+        </div>
+      )}
     </nav>
   );
 };

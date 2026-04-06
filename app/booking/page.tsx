@@ -26,6 +26,7 @@ import {
   Loader2,
   AlertTriangle
 } from "lucide-react";
+import BookingReceipt from "@/components/BookingReceipt";
 
 export default function BookingPage() {
   const router = useRouter();
@@ -627,85 +628,25 @@ export default function BookingPage() {
 
       {/* Hidden printable receipt */}
       <div id="receipt-printable" ref={receiptRef} style={{ display: "none" }}>
-        <div style={{ fontFamily: "Arial, sans-serif", padding: "40px", maxWidth: "700px", margin: "0 auto", border: "2px solid #020617" }}>
-          <div style={{ background: "#020617", color: "white", padding: "24px", marginBottom: "24px", borderBottom: "4px solid #ffc800" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div>
-                <div style={{ fontSize: "22px", fontWeight: "900", fontStyle: "italic", letterSpacing: "-0.05em", textTransform: "uppercase" }}>
-                  HIMALAYAN <span style={{ color: "#ffc800" }}>RIDER</span>
-                </div>
-                <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: "0.3em", marginTop: "2px" }}>
-                  Ride Your Freedom
-                </div>
-              </div>
-              <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: "10px", color: "#ffc800", textTransform: "uppercase", letterSpacing: "0.2em" }}>Booking Receipt</div>
-                <div style={{ fontSize: "14px", fontWeight: "900", color: "white", marginTop: "4px" }}>{bookingId}</div>
-                <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.4)", marginTop: "2px" }}>{new Date().toLocaleDateString("en-IN")}</div>
-              </div>
-            </div>
-          </div>
-
-          <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: "24px" }}>
-            <tbody>
-              <tr style={{ background: "#f8fafc" }}>
-                <td style={{ padding: "10px 12px", fontWeight: "900", fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.1em", color: "#64748b", border: "1px solid #e2e8f0" }}>Vehicle</td>
-                <td style={{ padding: "10px 12px", fontWeight: "900", fontSize: "13px", fontStyle: "italic", color: "#020617", border: "1px solid #e2e8f0" }}>{bike.name} ({bike.category})</td>
-              </tr>
-              <tr>
-                <td style={{ padding: "10px 12px", fontWeight: "900", fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.1em", color: "#64748b", border: "1px solid #e2e8f0" }}>Rider</td>
-                <td style={{ padding: "10px 12px", fontWeight: "700", fontSize: "12px", color: "#020617", border: "1px solid #e2e8f0" }}>{user.name} • {user.email}</td>
-              </tr>
-              <tr style={{ background: "#f8fafc" }}>
-                <td style={{ padding: "10px 12px", fontWeight: "900", fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.1em", color: "#64748b", border: "1px solid #e2e8f0" }}>Pickup</td>
-                <td style={{ padding: "10px 12px", fontWeight: "700", fontSize: "12px", color: "#020617", border: "1px solid #e2e8f0" }}>{form.pickupDate} at {form.pickupTime}</td>
-              </tr>
-              <tr>
-                <td style={{ padding: "10px 12px", fontWeight: "900", fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.1em", color: "#64748b", border: "1px solid #e2e8f0" }}>Drop Off</td>
-                <td style={{ padding: "10px 12px", fontWeight: "700", fontSize: "12px", color: "#020617", border: "1px solid #e2e8f0" }}>{form.dropoffDate} at {form.dropoffTime}</td>
-              </tr>
-              <tr style={{ background: "#f8fafc" }}>
-                <td style={{ padding: "10px 12px", fontWeight: "900", fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.1em", color: "#64748b", border: "1px solid #e2e8f0" }}>Duration</td>
-                <td style={{ padding: "10px 12px", fontWeight: "700", fontSize: "12px", color: "#020617", border: "1px solid #e2e8f0" }}>{days} Day{days !== 1 ? "s" : ""}</td>
-              </tr>
-              <tr>
-                <td style={{ padding: "10px 12px", fontWeight: "900", fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.1em", color: "#64748b", border: "1px solid #e2e8f0" }}>Location</td>
-                <td style={{ padding: "10px 12px", fontWeight: "700", fontSize: "12px", color: "#020617", border: "1px solid #e2e8f0" }}>Kanpur, India</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: "8px" }}>
-            <thead>
-              <tr style={{ background: "#020617", color: "white" }}>
-                <th style={{ padding: "10px 12px", fontWeight: "900", fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.2em", textAlign: "left" }}>Description</th>
-                <th style={{ padding: "10px 12px", fontWeight: "900", fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.2em", textAlign: "right" }}>Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td style={{ padding: "10px 12px", border: "1px solid #e2e8f0", fontSize: "11px", color: "#020617" }}>Rental ({days} day × ₹{pricePerDay})</td><td style={{ padding: "10px 12px", border: "1px solid #e2e8f0", fontSize: "11px", fontWeight: "700", color: "#020617", textAlign: "right" }}>₹{subtotal}</td></tr>
-              
-              {applyCoupon && bestCoupon && (
-                <tr style={{ background: "#f0fdf4" }}>
-                  <td style={{ padding: "10px 12px", border: "1px solid #e2e8f0", fontSize: "11px", color: "#166534", fontWeight: "700" }}>Reward Discount ({bestCoupon.discountPercent}%)</td>
-                  <td style={{ padding: "10px 12px", border: "1px solid #e2e8f0", fontSize: "11px", fontWeight: "700", color: "#166534", textAlign: "right" }}>- ₹{discountAmount}</td>
-                </tr>
-              )}
-
-              <tr style={{ background: "#f8fafc" }}><td style={{ padding: "10px 12px", border: "1px solid #e2e8f0", fontSize: "11px", color: "#020617" }}>GST (18%)</td><td style={{ padding: "10px 12px", border: "1px solid #e2e8f0", fontSize: "11px", fontWeight: "700", color: "#020617", textAlign: "right" }}>₹{tax}</td></tr>
-              <tr style={{ background: "#020617" }}>
-                <td style={{ padding: "14px 12px", fontSize: "12px", fontWeight: "900", textTransform: "uppercase", letterSpacing: "0.1em", color: "#ffc800" }}>TOTAL PAYABLE</td>
-                <td style={{ padding: "14px 12px", fontSize: "18px", fontWeight: "900", fontStyle: "italic", color: "white", textAlign: "right" }}>₹{total}</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div style={{ marginTop: "32px", paddingTop: "16px", borderTop: "2px solid #e2e8f0", display: "flex", justifyContent: "space-between", fontSize: "9px", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.2em" }}>
-            <span>support@himalayanrider.in</span>
-            <span>+91 9127008800</span>
-            <span>Kanpur, India</span>
-          </div>
-        </div>
+        <BookingReceipt
+          bookingId={bookingId}
+          date={new Date().toLocaleDateString("en-IN")}
+          user={{ name: user.name, email: user.email }}
+          bike={{
+             name: bike.name,
+             category: bike.category,
+             pricePerDay: pricePerDay
+          }}
+          pickupDate={form.pickupDate}
+          pickupTime={form.pickupTime}
+          dropoffDate={form.dropoffDate}
+          dropoffTime={form.dropoffTime}
+          duration={days}
+          subtotal={subtotal}
+          discount={discountAmount}
+          tax={tax}
+          total={total}
+        />
       </div>
     </div>
   );

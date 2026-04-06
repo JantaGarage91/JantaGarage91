@@ -7,14 +7,23 @@ import {
   UserPlus,
   Bike as BikeIcon,
   Gift,
-  LayoutDashboard
+  LayoutDashboard,
+  Menu,
+  X
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 
 export default function AdminSidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+
+  // Close mobile sidebar on route change
+  useEffect(() => {
+    setIsMobileOpen(false);
+  }, [pathname]);
 
   const navItems = [
     { icon: BarChart3, label: "Analytics", href: "/admin/dashboard" },
@@ -30,8 +39,39 @@ export default function AdminSidebar() {
   };
 
   return (
-    <aside className="w-64 bg-[#0f172a] border-r border-slate-800 flex flex-col hidden lg:flex shrink-0">
-      <div className="p-8 border-b border-slate-800 flex flex-col items-center justify-center gap-2">
+    <>
+      {/* Mobile Top Header */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 h-[72px] bg-[#0f172a] border-b border-slate-800 z-50 flex items-center justify-between px-6">
+        <div className="flex items-center gap-3">
+          <span className="text-xl font-black italic tracking-tighter uppercase text-[#ffc800]">
+            REN<span className="text-white">TRIP</span>
+          </span>
+          <span className="text-[8px] font-black text-slate-500 uppercase tracking-[0.4em] bg-slate-900 px-2 py-1 border border-slate-800">
+            Admin
+          </span>
+        </div>
+        <button 
+          onClick={() => setIsMobileOpen(!isMobileOpen)}
+          className="w-10 h-10 border border-slate-800 bg-slate-900 flex items-center justify-center text-white active:scale-95 transition-all"
+        >
+          {isMobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
+      </div>
+
+      {/* Sidebar Drawer */}
+      {isMobileOpen && (
+        <div 
+          className="lg:hidden fixed inset-0 bg-black/60 z-40 backdrop-blur-sm"
+          onClick={() => setIsMobileOpen(false)}
+        />
+      )}
+
+      <aside className={`
+        fixed inset-y-0 left-0 z-50 w-64 bg-[#0f172a] border-r border-slate-800 flex flex-col shrink-0
+        transform transition-transform duration-300 ease-in-out
+        ${isMobileOpen ? 'translate-x-0 shadow-2xl shadow-black/80' : '-translate-x-full lg:translate-x-0 lg:static lg:shadow-none'}
+      `}>
+        <div className="h-[72px] lg:h-auto lg:p-8 border-b border-slate-800 flex flex-col items-center justify-center gap-2 hidden lg:flex">
         <span className="text-xl font-black italic tracking-tighter uppercase text-[#ffc800]">
           REN<span className="text-white">TRIP</span>
         </span>
@@ -70,5 +110,6 @@ export default function AdminSidebar() {
         </button>
       </div>
     </aside>
+    </>
   );
 }

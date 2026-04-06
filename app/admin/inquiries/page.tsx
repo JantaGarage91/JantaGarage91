@@ -73,11 +73,11 @@ export default function AdminInquiries() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-100 flex overflow-hidden font-sans">
+    <div className="min-h-screen bg-[#020617] text-slate-100 flex flex-col lg:flex-row overflow-hidden font-sans">
       <AdminSidebar />
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto p-12">
+      <main className="flex-1 overflow-y-auto p-6 pt-24 lg:p-12 lg:pt-12">
           {/* Top Header */}
           <div className="flex justify-between items-center mb-12">
             <div className="space-y-1">
@@ -113,7 +113,8 @@ export default function AdminInquiries() {
           </div>
 
           {/* Inquiries Table / List */}
-          <div className="bg-[#0f172a] border border-slate-800 overflow-hidden">
+          <div className="bg-[#0f172a] border border-slate-800 overflow-x-auto">
+            <div className="min-w-[800px]">
              <div className="grid grid-cols-6 p-6 border-b border-slate-800 bg-slate-900/50 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
                 <div className="col-span-2">Customer Details</div>
                 <div className="col-span-1">Topic</div>
@@ -149,7 +150,7 @@ export default function AdminInquiries() {
                              {inquiry.status}
                           </span>
                        </div>
-                       <div className="col-span-2 flex justify-end gap-3 opacity-60 group-hover:opacity-100 transition-opacity">
+                       <div className="col-span-2 flex justify-end gap-3 opacity-60 md:opacity-100 lg:opacity-60 lg:group-hover:opacity-100 transition-opacity">
                           <button 
                              onClick={() => alert(`Message: ${inquiry.message}`)}
                              className="p-3 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-400 hover:text-white transition-all"
@@ -172,6 +173,7 @@ export default function AdminInquiries() {
                   ))
                 )}
              </div>
+            </div>
           </div>
       </main>
     </div>

@@ -7,6 +7,7 @@ import ReviewsSlider from "@/components/ReviewsSlider";
 import HowItWorks from "@/components/HowItWorks";
 import FAQ from "@/components/FAQ";
 import AuthModal from "@/components/AuthModal";
+import KYCModal from "@/components/KYCModal";
 import { 
   ChevronRight, 
   ArrowRight, 
@@ -27,12 +28,19 @@ import {
 export default function Home() {
   const [user, setUser] = useState<any>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isKYCModalOpen, setIsKYCModalOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      try {
+        const parsed = JSON.parse(storedUser);
+        setUser(parsed);
+      } catch (e) {
+        console.error("Failed to parse user from localStorage", e);
+        localStorage.removeItem("user");
+      }
     }
   }, []);
 
@@ -44,10 +52,28 @@ export default function Home() {
     city: "Kanpur"
   });
 
+  const handleFieldInteraction = (e: React.MouseEvent | React.FocusEvent) => {
+    if (!user) {
+      e.preventDefault();
+      (e.target as HTMLElement).blur?.();
+      setIsAuthModalOpen(true);
+      return;
+    }
+    if (!user.aadhaarUrl || !user.dlUrl) {
+      e.preventDefault();
+      (e.target as HTMLElement).blur?.();
+      setIsKYCModalOpen(true);
+    }
+  };
+
   const handleHeroFindBike = (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
       setIsAuthModalOpen(true);
+      return;
+    }
+    if (!user.aadhaarUrl || !user.dlUrl) {
+      setIsKYCModalOpen(true);
       return;
     }
     // Save to localStorage so rent-bikes can pick it up
@@ -62,6 +88,11 @@ export default function Home() {
         isOpen={isAuthModalOpen} 
         onClose={() => setIsAuthModalOpen(false)}
         onSuccess={(userData) => setUser(userData)}
+      />
+
+      <KYCModal 
+        isOpen={isKYCModalOpen} 
+        onClose={() => setIsKYCModalOpen(false)} 
       />
 
       {/* Premium Hero Section */}
@@ -85,7 +116,7 @@ export default function Home() {
                HIMALAYAN <span className="text-[#ffc800]">RIDER</span>
              </div>
              
-             <h1 className="text-6xl md:text-8xl font-black text-white uppercase tracking-tighter shadow-text leading-[0.85] flex flex-col">
+             <h1 className="text-5xl sm:text-6xl md:text-8xl font-black text-white uppercase tracking-tighter shadow-text leading-[0.85] flex flex-col">
                <span>RENT BIKE IN</span>
                <span className="text-[#ffc800] animate-pulse inline-block">KANPUR</span>
              </h1>
@@ -136,109 +167,117 @@ export default function Home() {
              </div>
              {/* Straight Inner Content */}
              <div className="relative z-10 p-7 md:p-10">
-               <form onSubmit={handleHeroFindBike} className="grid grid-cols-1 md:grid-cols-5 gap-8 items-end">
-               
-                 {/* Pick Up Date */}
-                 <div className="space-y-3">
-                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-4">Pick up Date</label>
-                   <div className="relative -skew-x-12 bg-white border border-slate-200 hover:border-[#1e293b] transition-colors shadow-sm h-[48px] flex items-center transition-all">
-                     <div className="skew-x-12 flex items-center w-full px-6 gap-3">
-                       <input 
-                        type="date" 
-                        required
-                        value={bookingForm.pickupDate}
-                        onChange={(e) => setBookingForm({ ...bookingForm, pickupDate: e.target.value })}
-                        className="bg-transparent w-full text-xs font-black text-slate-900 outline-none uppercase cursor-pointer" 
-                       />
-                     </div>
-                   </div>
-                 </div>
+                <form onSubmit={handleHeroFindBike} className="grid grid-cols-1 md:grid-cols-5 gap-8 items-end">
+                
+                  {/* Pick Up Date */}
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-4 md:ml-4">Pick up Date</label>
+                    <div className="relative md:-skew-x-12 bg-white border border-slate-200 hover:border-[#1e293b] transition-colors shadow-sm h-[48px] flex items-center transition-all">
+                      <div className="md:skew-x-12 flex items-center w-full px-4 md:px-6 gap-3">
+                        <input 
+                         type="date" 
+                         required
+                         value={bookingForm.pickupDate}
+                         onClick={handleFieldInteraction}
+                         onFocus={handleFieldInteraction}
+                         onChange={(e) => setBookingForm({ ...bookingForm, pickupDate: e.target.value })}
+                         className="bg-transparent w-full text-xs font-black text-slate-900 outline-none uppercase cursor-pointer" 
+                        />
+                      </div>
+                    </div>
+                  </div>
 
-                 {/* Pick Up Time */}
-                 <div className="space-y-3">
-                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-4">Pick Time</label>
-                   <div className="relative -skew-x-12 bg-white border border-slate-200 hover:border-[#1e293b] transition-colors shadow-sm h-[48px] flex items-center transition-all">
-                     <div className="skew-x-12 flex items-center w-full px-6 gap-3">
-                       <select 
-                        required
-                        value={bookingForm.pickupTime}
-                        onChange={(e) => setBookingForm({ ...bookingForm, pickupTime: e.target.value })}
-                        className="bg-transparent w-full text-[10px] font-black text-slate-900 outline-none appearance-none cursor-pointer uppercase"
-                       >
-                         <option value="">Time</option>
-                         <option>09:00 AM</option>
-                         <option>11:00 AM</option>
-                         <option>02:00 PM</option>
-                         <option>06:00 PM</option>
-                       </select>
-                     </div>
-                   </div>
-                 </div>
+                  {/* Pick Up Time */}
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-4 md:ml-4">Pick Time</label>
+                    <div className="relative md:-skew-x-12 bg-white border border-slate-200 hover:border-[#1e293b] transition-colors shadow-sm h-[48px] flex items-center transition-all">
+                      <div className="md:skew-x-12 flex items-center w-full px-4 md:px-6 gap-3">
+                        <select 
+                         required
+                         value={bookingForm.pickupTime}
+                         onClick={handleFieldInteraction}
+                         onFocus={handleFieldInteraction}
+                         onChange={(e) => setBookingForm({ ...bookingForm, pickupTime: e.target.value })}
+                         className="bg-transparent w-full text-[10px] font-black text-slate-900 outline-none appearance-none cursor-pointer uppercase"
+                        >
+                          <option value="">Time</option>
+                          <option>09:00 AM</option>
+                          <option>11:00 AM</option>
+                          <option>02:00 PM</option>
+                          <option>06:00 PM</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
 
-                 {/* Drop Off Date */}
-                 <div className="space-y-3">
-                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-4">Drop off</label>
-                   <div className="relative -skew-x-12 bg-white border border-slate-200 hover:border-[#1e293b] transition-colors shadow-sm h-[48px] flex items-center transition-all">
-                     <div className="skew-x-12 flex items-center w-full px-6 gap-3">
-                       <input 
-                        type="date" 
-                        required
-                        value={bookingForm.dropoffDate}
-                        onChange={(e) => setBookingForm({ ...bookingForm, dropoffDate: e.target.value })}
-                        className="bg-transparent w-full text-xs font-black text-slate-900 outline-none uppercase cursor-pointer" 
-                       />
-                     </div>
-                   </div>
-                 </div>
+                  {/* Drop Off Date */}
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-4 md:ml-4">Drop off</label>
+                    <div className="relative md:-skew-x-12 bg-white border border-slate-200 hover:border-[#1e293b] transition-colors shadow-sm h-[48px] flex items-center transition-all">
+                      <div className="md:skew-x-12 flex items-center w-full px-4 md:px-6 gap-3">
+                        <input 
+                         type="date" 
+                         required
+                         value={bookingForm.dropoffDate}
+                         onClick={handleFieldInteraction}
+                         onFocus={handleFieldInteraction}
+                         onChange={(e) => setBookingForm({ ...bookingForm, dropoffDate: e.target.value })}
+                         className="bg-transparent w-full text-xs font-black text-slate-900 outline-none uppercase cursor-pointer" 
+                        />
+                      </div>
+                    </div>
+                  </div>
 
-                 {/* Drop Time */}
-                 <div className="space-y-3">
-                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-4">Drop Time</label>
-                   <div className="relative -skew-x-12 bg-white border border-slate-200 hover:border-[#1e293b] transition-colors shadow-sm h-[48px] flex items-center transition-all">
-                     <div className="skew-x-12 flex items-center w-full px-6 gap-3">
-                       <select 
-                        required
-                        value={bookingForm.dropoffTime}
-                        onChange={(e) => setBookingForm({ ...bookingForm, dropoffTime: e.target.value })}
-                        className="bg-transparent w-full text-[10px] font-black text-slate-900 outline-none appearance-none cursor-pointer uppercase"
-                       >
-                         <option value="">Time</option>
-                         <option>09:00 AM</option>
-                         <option>11:00 AM</option>
-                         <option>02:00 PM</option>
-                         <option>06:00 PM</option>
-                       </select>
-                     </div>
-                   </div>
-                 </div>
+                  {/* Drop Time */}
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-4 md:ml-4">Drop Time</label>
+                    <div className="relative md:-skew-x-12 bg-white border border-slate-200 hover:border-[#1e293b] transition-colors shadow-sm h-[48px] flex items-center transition-all">
+                      <div className="md:skew-x-12 flex items-center w-full px-4 md:px-6 gap-3">
+                        <select 
+                         required
+                         value={bookingForm.dropoffTime}
+                         onClick={handleFieldInteraction}
+                         onFocus={handleFieldInteraction}
+                         onChange={(e) => setBookingForm({ ...bookingForm, dropoffTime: e.target.value })}
+                         className="bg-transparent w-full text-[10px] font-black text-slate-900 outline-none appearance-none cursor-pointer uppercase"
+                        >
+                          <option value="">Time</option>
+                          <option>09:00 AM</option>
+                          <option>11:00 AM</option>
+                          <option>02:00 PM</option>
+                          <option>06:00 PM</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
 
-                 {/* Find Bike CTA */}
-                 <div>
-                   <button 
-                    type="submit" 
-                    onClick={(e) => {
-                      const pickup = new Date(bookingForm.pickupDate);
-                      const dropoff = new Date(bookingForm.dropoffDate);
-                      if (pickup.getTime() === dropoff.getTime()) {
-                        e.preventDefault();
-                        alert("Same-day bookings are not available. Minimum rental period is 24 hours.");
-                        return;
-                      }
-                      if (dropoff < pickup) {
-                        e.preventDefault();
-                        alert("Drop-off date must be after the pick-up date.");
-                        return;
-                      }
-                    }}
-                    className="relative w-full -skew-x-12 h-[48px] bg-slate-900 hover:bg-[#ffc800] group/btn transition-colors overflow-hidden shadow-lg shadow-black/20 active:scale-95 border-2 border-slate-900"
-                   >
-                     <div className="skew-x-12 flex items-center justify-center gap-2">
-                       <span className="text-[10px] font-black uppercase tracking-widest text-white group-hover/btn:text-black">Find Bike</span>
-                       <ArrowRight className="w-4 h-4 text-[#ffc800] group-hover/btn:text-black group-hover/btn:translate-x-1 transition-all" />
-                     </div>
-                   </button>
-                 </div>
-               </form>
+                  {/* Find Bike CTA */}
+                  <div>
+                    <button 
+                     type="submit" 
+                     onClick={(e) => {
+                       const pickup = new Date(bookingForm.pickupDate);
+                       const dropoff = new Date(bookingForm.dropoffDate);
+                       if (pickup.getTime() === dropoff.getTime()) {
+                         e.preventDefault();
+                         alert("Same-day bookings are not available. Minimum rental period is 24 hours.");
+                         return;
+                       }
+                       if (dropoff < pickup) {
+                         e.preventDefault();
+                         alert("Drop-off date must be after the pick-up date.");
+                         return;
+                       }
+                     }}
+                     className="relative w-full md:-skew-x-12 h-[48px] bg-slate-900 hover:bg-[#ffc800] group/btn transition-colors overflow-hidden shadow-lg shadow-black/20 active:scale-95 border-2 border-slate-900"
+                    >
+                      <div className="md:skew-x-12 flex items-center justify-center gap-2">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-white group-hover/btn:text-black">Find Bike</span>
+                        <ArrowRight className="w-4 h-4 text-[#ffc800] group-hover/btn:text-black group-hover/btn:translate-x-1 transition-all" />
+                      </div>
+                    </button>
+                  </div>
+                </form>
              </div>
           </div>
         </div>
@@ -322,3 +361,4 @@ export default function Home() {
     </div>
   );
 }
+

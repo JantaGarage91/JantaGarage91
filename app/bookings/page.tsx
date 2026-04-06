@@ -17,12 +17,16 @@ import {
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import BookingReceipt from "@/components/BookingReceipt";
+import { useRef } from "react";
 
 export default function MyBookingsPage() {
   const [user, setUser] = useState<any>(null);
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [printBooking, setPrintBooking] = useState<any>(null);
+  const printRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -52,6 +56,49 @@ export default function MyBookingsPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePrint = (booking: any) => {
+    setPrintBooking(booking);
+    
+    // We need to wait for the hidden receipt to render before printing
+    setTimeout(() => {
+        const printContent = printRef.current;
+        if (printContent) {
+            const receiptHtml = printContent.innerHTML;
+            const printWindow = window.open("", "_blank", "width=800,height=900");
+            if (printWindow) {
+                printWindow.document.write(`
+                  <!DOCTYPE html>
+                  <html>
+                    <head>
+                      <title>Himalayan Rider Receipt - ${booking.bookingId}</title>
+                      <script src="https://cdn.tailwindcss.com"></script>
+                      <style>
+                        body { margin: 0; padding: 20px; font-family: sans-serif; }
+                        @media print {
+                          body { padding: 0; }
+                          @page { margin: 0.5cm; }
+                        }
+                      </style>
+                    </head>
+                    <body>
+                      <div id="receipt-root">${receiptHtml}</div>
+                      <script>
+                        window.onload = () => {
+                          setTimeout(() => {
+                            window.print();
+                            window.close();
+                          }, 500);
+                        };
+                      </script>
+                    </body>
+                  </html>
+                `);
+                printWindow.document.close();
+            }
+        }
+    }, 100);
   };
 
   if (!user && !loading) {
@@ -198,11 +245,11 @@ export default function MyBookingsPage() {
                              <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Booking Confirmed</span>
                           </div>
                           <button 
-                            onClick={() => window.print()}
+                            onClick={() => handlePrint(booking)}
                             className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-900 hover:text-[#ffc800] transition-colors"
                           >
                             <ExternalLink className="w-4 h-4" />
-                            Print Receipt
+                            Download Receipt
                           </button>
                        </div>
                     </div>
@@ -213,6 +260,29 @@ export default function MyBookingsPage() {
           )}
         </div>
       </section>
+
+      {/* Hidden printable area */}
+      {printBooking && (
+        <div ref={printRef} style={{ display: "none" }}>
+          <BookingReceipt
+            bookingId={printBooking.bookingId}
+            date={new Date(printBooking.createdAt).toLocaleDateString("en-IN")}
+            user={{ name: printBooking.user.name, email: printBooking.user.email }}
+            bike={{
+              name: printBooking.bike.name,
+              category: "Machine",
+              pricePerDay: printBooking.bike.pricePerDay
+            }}
+            pickupDate={printBooking.pickupDate}
+            pickupTime={printBooking.pickupTime}
+            dropoffDate={printBooking.dropoffDate || printBooking.pickupDate}
+            dropoffTime={printBooking.dropoffTime || printBooking.pickupTime}
+            duration={printBooking.duration}
+            total={printBooking.totalPrice}
+            location="Kanpur Hub"
+          />
+        </div>
+      )}
     </div>
   );
 }

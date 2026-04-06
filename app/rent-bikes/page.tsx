@@ -21,6 +21,7 @@ import {
   ArrowRight
 } from "lucide-react";
 import AuthModal from "@/components/AuthModal";
+import KYCModal from "@/components/KYCModal";
 
 export default function RentBikesPage() {
   const [user, setUser] = useState<any>(null);
@@ -30,6 +31,7 @@ export default function RentBikesPage() {
   const [filter, setFilter] = useState("All");
   const [showOnlyAvailable, setShowOnlyAvailable] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isKYCModalOpen, setIsKYCModalOpen] = useState(false);
   const router = useRouter();
 
   const [bookingForm, setBookingForm] = useState({
@@ -81,7 +83,18 @@ export default function RentBikesPage() {
       setIsAuthModalOpen(true);
       return false;
     }
+    if (!user.aadhaarUrl || !user.dlUrl) {
+      if (e) e.preventDefault();
+      setIsKYCModalOpen(true);
+      return false;
+    }
     return true;
+  };
+
+  const handleFieldInteraction = (e: React.MouseEvent | React.FocusEvent) => {
+    if (!handleAuthGuard()) {
+      (e.target as HTMLElement).blur?.();
+    }
   };
 
   const handleNextStep = (e: React.FormEvent) => {
@@ -92,6 +105,7 @@ export default function RentBikesPage() {
   };
 
   const handleBookNow = (bike: any) => {
+    if (!handleAuthGuard()) return;
     localStorage.setItem("pendingBooking", JSON.stringify({ bike, bookingForm }));
     router.push("/booking");
   };
@@ -136,6 +150,11 @@ export default function RentBikesPage() {
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
         onSuccess={(userData) => setUser(userData)}
+      />
+
+      <KYCModal 
+        isOpen={isKYCModalOpen} 
+        onClose={() => setIsKYCModalOpen(false)} 
       />
 
       {/* Hero Section */}
@@ -186,13 +205,15 @@ export default function RentBikesPage() {
                   <form onSubmit={handleNextStep} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 items-end">
                     <div className="space-y-3">
                       <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Pick Up Date</label>
-                      <div className="relative -skew-x-12 bg-white border border-slate-200 hover:border-[#020617] transition-all shadow-sm h-[56px] flex items-center group/field">
-                        <div className="skew-x-12 flex items-center w-full px-6 gap-3">
+                      <div className="relative md:-skew-x-12 bg-white border border-slate-200 hover:border-[#020617] transition-all shadow-sm h-[56px] flex items-center group/field">
+                        <div className="md:skew-x-12 flex items-center w-full px-4 md:px-6 gap-3">
                           <Calendar className="w-4 h-4 text-slate-400 group-hover/field:text-[#ffc800]" />
                           <input
                             type="date"
                             required
                             value={bookingForm.pickupDate}
+                            onClick={handleFieldInteraction}
+                            onFocus={handleFieldInteraction}
                             onChange={(e) => setBookingForm({ ...bookingForm, pickupDate: e.target.value })}
                             className="bg-transparent w-full text-sm font-black text-slate-900 outline-none uppercase cursor-pointer"
                           />
@@ -202,12 +223,14 @@ export default function RentBikesPage() {
 
                     <div className="space-y-3">
                       <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Pick Time</label>
-                      <div className="relative -skew-x-12 bg-white border border-slate-200 hover:border-[#020617] transition-all shadow-sm h-[56px] flex items-center group/field">
-                        <div className="skew-x-12 flex items-center w-full px-6 gap-3">
+                      <div className="relative md:-skew-x-12 bg-white border border-slate-200 hover:border-[#020617] transition-all shadow-sm h-[56px] flex items-center group/field">
+                        <div className="md:skew-x-12 flex items-center w-full px-4 md:px-6 gap-3">
                           <Clock className="w-4 h-4 text-slate-400 group-hover/field:text-[#ffc800]" />
                           <select
                             required
                             value={bookingForm.pickupTime}
+                            onClick={handleFieldInteraction}
+                            onFocus={handleFieldInteraction}
                             onChange={(e) => setBookingForm({ ...bookingForm, pickupTime: e.target.value })}
                             className="bg-transparent w-full text-sm font-black text-slate-900 outline-none appearance-none cursor-pointer uppercase"
                           >
@@ -223,13 +246,15 @@ export default function RentBikesPage() {
 
                     <div className="space-y-3">
                       <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Drop Off Date</label>
-                      <div className="relative -skew-x-12 bg-white border border-slate-200 hover:border-[#020617] transition-all shadow-sm h-[56px] flex items-center group/field">
-                        <div className="skew-x-12 flex items-center w-full px-6 gap-3">
+                      <div className="relative md:-skew-x-12 bg-white border border-slate-200 hover:border-[#020617] transition-all shadow-sm h-[56px] flex items-center group/field">
+                        <div className="md:skew-x-12 flex items-center w-full px-4 md:px-6 gap-3">
                           <Calendar className="w-4 h-4 text-slate-400 group-hover/field:text-[#ffc800]" />
                           <input
                             type="date"
                             required
                             value={bookingForm.dropoffDate}
+                            onClick={handleFieldInteraction}
+                            onFocus={handleFieldInteraction}
                             onChange={(e) => setBookingForm({ ...bookingForm, dropoffDate: e.target.value })}
                             className="bg-transparent w-full text-sm font-black text-slate-900 outline-none uppercase cursor-pointer"
                           />
@@ -239,12 +264,14 @@ export default function RentBikesPage() {
 
                     <div className="space-y-3">
                       <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Drop Time</label>
-                      <div className="relative -skew-x-12 bg-white border border-slate-200 hover:border-[#020617] transition-all shadow-sm h-[56px] flex items-center group/field">
-                        <div className="skew-x-12 flex items-center w-full px-6 gap-3">
+                      <div className="relative md:-skew-x-12 bg-white border border-slate-200 hover:border-[#020617] transition-all shadow-sm h-[56px] flex items-center group/field">
+                        <div className="md:skew-x-12 flex items-center w-full px-4 md:px-6 gap-3">
                           <Clock className="w-4 h-4 text-slate-400 group-hover/field:text-[#ffc800]" />
                           <select
                             required
                             value={bookingForm.dropoffTime}
+                            onClick={handleFieldInteraction}
+                            onFocus={handleFieldInteraction}
                             onChange={(e) => setBookingForm({ ...bookingForm, dropoffTime: e.target.value })}
                             className="bg-transparent w-full text-sm font-black text-slate-900 outline-none appearance-none cursor-pointer uppercase"
                           >
@@ -275,9 +302,9 @@ export default function RentBikesPage() {
                             return;
                           }
                         }}
-                        className="relative w-full -skew-x-12 h-[56px] bg-[#020617] hover:bg-[#ffc800] group/btn transition-all overflow-hidden shadow-lg shadow-black/20 active:scale-95 border-2 border-[#020617]"
+                        className="relative w-full md:-skew-x-12 h-[56px] bg-[#020617] hover:bg-[#ffc800] group/btn transition-all overflow-hidden shadow-lg shadow-black/20 active:scale-95 border-2 border-[#020617]"
                       >
-                        <div className="skew-x-12 flex items-center justify-center gap-3">
+                        <div className="md:skew-x-12 flex items-center justify-center gap-3">
                           <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white group-hover/btn:text-black">Find Bike</span>
                           <ArrowRight className="w-4 h-4 text-[#ffc800] group-hover/btn:text-black group-hover/btn:translate-x-1 transition-all" />
                         </div>

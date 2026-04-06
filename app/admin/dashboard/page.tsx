@@ -117,11 +117,11 @@ export default function AdminDashboard() {
   const availableBikes = bikes.filter(b => b.status === "AVAILABLE").length;
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-100 flex overflow-hidden">
+    <div className="min-h-screen bg-[#020617] text-slate-100 flex flex-col lg:flex-row overflow-hidden">
       <AdminSidebar />
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto p-12">
+      <main className="flex-1 overflow-y-auto p-6 pt-24 lg:p-12 lg:pt-12">
          {/* Top Header */}
          <div className="flex justify-between items-center mb-12">
             <div className="space-y-1">

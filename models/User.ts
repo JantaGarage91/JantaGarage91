@@ -4,8 +4,10 @@ export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
-  role: "ADMIN" | "WORKER";
+  role: "ADMIN" | "WORKER" | "USER";
   isActive: boolean;
+  aadhaarUrl?: string;
+  dlUrl?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -17,11 +19,13 @@ const UserSchema: Schema = new Schema(
     password: { type: String, required: true },
     role: { 
       type: String, 
-      enum: ["ADMIN", "WORKER"], 
+      enum: ["ADMIN", "WORKER", "USER"], 
       required: true,
-      default: "WORKER"
+      default: "USER"
     },
     isActive: { type: Boolean, default: true },
+    aadhaarUrl: { type: String },
+    dlUrl: { type: String },
   },
   { timestamps: true }
 );
