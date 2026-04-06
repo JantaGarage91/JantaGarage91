@@ -9,7 +9,8 @@ import {
   Gift,
   LayoutDashboard,
   Menu,
-  X
+  X,
+  FileText
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -27,6 +28,7 @@ export default function AdminSidebar() {
 
   const navItems = [
     { icon: BarChart3, label: "Analytics", href: "/admin/dashboard" },
+    { icon: FileText, label: "Booking Inventory", href: "/admin/bookings" },
     { icon: BikeIcon, label: "Fleet Management", href: "/admin/fleet" },
     { icon: Gift, label: "Coupon System", href: "/admin/coupons" },
     { icon: UserPlus, label: "Worker Hub", href: "/admin/workers" },

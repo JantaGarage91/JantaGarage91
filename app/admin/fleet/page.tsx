@@ -22,7 +22,8 @@ import {
   Wrench,
   Upload,
   Loader2,
-  FileText
+  FileText,
+  ChevronDown
 } from "lucide-react";
 import Link from "next/link";
 import axios from "axios";
@@ -197,28 +198,28 @@ export default function AdminFleet() {
       <AdminSidebar />
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto p-6 pt-24 lg:p-12 lg:pt-12">
+      <main className="flex-1 overflow-y-auto p-5 md:p-10 pt-24 lg:p-12 lg:pt-12">
           {/* Top Header */}
-          <div className="flex justify-between items-center mb-12">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
             <div className="space-y-1">
-              <h1 className="text-3xl font-black uppercase tracking-tighter">FLEET HUB CONTROL</h1>
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Global Asset Registry • Add & Manage Inventory</p>
+              <h1 className="text-2xl md:text-3xl font-black uppercase tracking-tighter">FLEET HUB <span className="text-[#ffc800]">CONTROL</span></h1>
+              <p className="text-[9px] md:text-[10px] font-black text-slate-500 uppercase tracking-widest">Global Asset Registry • Add & Manage Inventory</p>
             </div>
             
-            <div className="flex items-center gap-6">
-               <div className="text-right">
-                  <div className="text-[10px] font-black uppercase tracking-widest text-white">{user.name}</div>
-                  <div className="text-[9px] font-black uppercase tracking-widest text-blue-500">ADMIN CONTROL</div>
+            <div className="flex items-center gap-4 bg-white/5 p-3 rounded-none border border-white/5 w-full md:w-auto">
+               <div className="text-right flex-1 md:flex-none">
+                  <div className="text-[10px] font-black uppercase tracking-widest text-[#ffc800]">{user.name}</div>
+                  <div className="text-[8px] font-black uppercase tracking-widest text-blue-500">ADMIN CONTROL</div>
                </div>
-               <div className="w-12 h-12 bg-slate-800 border border-slate-700 rounded-xl flex items-center justify-center">
-                  <span className="font-black text-xs text-white">{user.name.charAt(0)}</span>
+               <div className="w-10 h-10 md:w-12 md:h-12 bg-slate-800 border border-slate-700 flex items-center justify-center -skew-x-6">
+                  <span className="font-black text-xs text-white skew-x-6">{user.name.charAt(0)}</span>
                </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-12">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-10">
              {/* Form Section */}
-             <div className="bg-[#0f172a] border border-slate-800 flex flex-col p-8 h-fit sticky top-0 shadow-2xl">
+             <div className="bg-[#0f172a] border border-white/5 flex flex-col p-6 md:p-8 h-fit lg:sticky lg:top-4 shadow-2xl">
                 <div className="flex justify-between items-start mb-8">
                    <div>
                       <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-[#ffc800]">
@@ -226,23 +227,23 @@ export default function AdminFleet() {
                       </h3>
                    </div>
                    {isEditing && (
-                      <button onClick={resetForm} className="p-2 bg-slate-800 border border-slate-700 rounded hover:bg-red-500 transition-colors">
+                      <button onClick={resetForm} className="p-2 border border-white/10 hover:bg-red-500 transition-colors">
                          <X className="w-4 h-4" />
                       </button>
                    )}
                 </div>
 
-                <form onSubmit={handleCreateOrUpdate} className="grid grid-cols-2 gap-4">
-                    <div className="col-span-2 space-y-2">
+                <form onSubmit={handleCreateOrUpdate} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="md:col-span-2 space-y-2">
                          <label className="text-[9px] font-black uppercase tracking-widest text-slate-500 ml-1">Type of Vehicle</label>
-                         <div className="flex gap-4">
+                         <div className="flex gap-2">
                             {["BIKE", "SCOOTY"].map(type => (
                                <button 
                                   key={type}
                                   type="button"
                                   onClick={() => setFormData({...formData, category: type as "BIKE" | "SCOOTY"})}
                                   className={`flex-1 py-3 text-[10px] font-black uppercase tracking-[0.2em] border transition-all ${
-                                     formData.category === type ? 'bg-[#ffc800] text-black border-[#ffc800]' : 'bg-slate-900 text-slate-500 border-slate-800 hover:border-slate-600'
+                                     formData.category === type ? 'bg-[#ffc800] text-black border-[#ffc800]' : 'bg-slate-900/50 text-slate-500 border-white/5 hover:border-white/20'
                                   }`}
                                >
                                   {type}
@@ -259,7 +260,7 @@ export default function AdminFleet() {
                             required
                             value={formData.name}
                             onChange={(e) => setFormData({...formData, name: e.target.value})}
-                            className="w-full bg-[#020617] border border-slate-800 px-4 py-3 text-sm font-bold focus:outline-none focus:border-[#ffc800]" 
+                            className="w-full bg-[#020617] border border-white/10 px-4 py-3.5 text-xs font-bold focus:outline-none focus:border-[#ffc800] transition-colors" 
                          />
                     </div>
                     <div className="space-y-2">
@@ -270,7 +271,7 @@ export default function AdminFleet() {
                             required
                             value={formData.bikeModel}
                             onChange={(e) => setFormData({...formData, bikeModel: e.target.value})}
-                            className="w-full bg-[#020617] border border-slate-800 px-4 py-3 text-sm font-bold focus:outline-none focus:border-[#ffc800]" 
+                            className="w-full bg-[#020617] border border-white/10 px-4 py-3.5 text-xs font-bold focus:outline-none focus:border-[#ffc800] transition-colors" 
                          />
                     </div>
 
@@ -284,7 +285,7 @@ export default function AdminFleet() {
                                required
                                value={formData.vehicleNumber}
                                onChange={(e) => setFormData({...formData, vehicleNumber: e.target.value})}
-                               className="w-full bg-[#020617] border border-slate-800 pl-10 pr-4 py-3 text-sm font-bold focus:outline-none focus:border-[#ffc800]" 
+                               className="w-full bg-[#020617] border border-white/10 pl-10 pr-4 py-3.5 text-xs font-bold focus:outline-none focus:border-[#ffc800] transition-colors" 
                             />
                          </div>
                     </div>
@@ -298,28 +299,28 @@ export default function AdminFleet() {
                                required
                                value={formData.cc}
                                onChange={(e) => setFormData({...formData, cc: e.target.value})}
-                               className="w-full bg-[#020617] border border-slate-800 pl-10 pr-4 py-3 text-sm font-bold focus:outline-none focus:border-[#ffc800]" 
+                               className="w-full bg-[#020617] border border-white/10 pl-10 pr-4 py-3.5 text-xs font-bold focus:outline-none focus:border-[#ffc800] transition-colors" 
                             />
                          </div>
                     </div>
 
-                    <div className="col-span-2 space-y-2">
-                         <label className="text-[9px] font-black uppercase tracking-widest text-slate-500 ml-1">Vehicle Appearance (Upload Photo)</label>
-                         <div className={`relative border-2 border-dashed rounded-2xl p-6 transition-all flex flex-col items-center justify-center gap-4 ${
-                            formData.image ? 'border-emerald-500/50 bg-emerald-500/5' : 'border-slate-800 bg-[#020617] hover:border-[#ffc800]/50'
+                    <div className="md:col-span-2 space-y-2">
+                         <label className="text-[9px] font-black uppercase tracking-widest text-slate-500 ml-1">Vehicle Appearance (Photo)</label>
+                         <div className={`relative border border-dashed p-6 lg:p-10 transition-all flex flex-col items-center justify-center gap-4 ${
+                            formData.image ? 'border-emerald-500/50 bg-emerald-500/5' : 'border-white/10 bg-[#020617] hover:border-[#ffc800]/50'
                          }`}>
                             {isUploading ? (
                                <div className="flex flex-col items-center gap-3">
                                   <Loader2 className="w-8 h-8 text-[#ffc800] animate-spin" />
-                                  <span className="text-[10px] font-black uppercase tracking-widest animate-pulse">Syncing to Cloud...</span>
+                                  <span className="text-[10px] font-black uppercase tracking-widest animate-pulse">Syncing Cloud...</span>
                                </div>
                             ) : formData.image ? (
                                <div className="relative group/img w-full h-40">
-                                  <img src={formData.image} className="w-full h-full object-contain rounded-xl" />
+                                  <img src={formData.image} className="w-full h-full object-contain" />
                                   <button 
                                      type="button"
                                      onClick={() => setFormData({...formData, image: ""})}
-                                     className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full opacity-0 group-hover/img:opacity-100 transition-opacity"
+                                     className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-none opacity-0 group-hover/img:opacity-100 transition-opacity"
                                   >
                                      <Trash2 className="w-4 h-4" />
                                   </button>
@@ -328,8 +329,8 @@ export default function AdminFleet() {
                                <>
                                   <Upload className="w-8 h-8 text-slate-700" />
                                   <div className="text-center">
-                                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Drop Machine Image or Click to Browse</p>
-                                     <p className="text-[8px] font-bold text-slate-700 mt-1">MAX SIZE 5MB • JPG/PNG/WEBP</p>
+                                     <p className="text-[9px] font-black uppercase tracking-widest text-slate-500">Click to Upload Asset</p>
+                                     <p className="text-[7px] font-bold text-slate-700 mt-1 uppercase">MAX 5MB • JPG/PNG</p>
                                   </div>
                                   <input 
                                      type="file" 
@@ -350,32 +351,32 @@ export default function AdminFleet() {
                             required
                             value={formData.pricePerDay}
                             onChange={(e) => setFormData({...formData, pricePerDay: e.target.value})}
-                            className="w-full bg-[#020617] border border-slate-800 px-4 py-3 text-sm font-bold focus:outline-none focus:border-[#ffc800]" 
+                            className="w-full bg-[#020617] border border-white/10 px-4 py-3.5 text-xs font-bold focus:outline-none focus:border-[#ffc800] transition-colors" 
                          />
                     </div>
 
-                    <div className="col-span-2 space-y-2">
-                         <label className="text-[9px] font-black uppercase tracking-widest text-slate-500 ml-1">Short Description (Optional)</label>
+                    <div className="md:col-span-2 space-y-2">
+                         <label className="text-[9px] font-black uppercase tracking-widest text-slate-500 ml-1">Short Description</label>
                          <div className="relative">
                             <FileText className="absolute left-4 top-4 w-3.5 h-3.5 text-slate-600" />
                             <textarea 
-                               placeholder="Enter any special notes about this vehicle..."
+                               placeholder="Special notes..."
                                rows={3}
                                value={formData.description}
                                onChange={(e) => setFormData({...formData, description: e.target.value})}
-                               className="w-full bg-[#020617] border border-slate-800 pl-10 pr-4 py-3 text-sm font-bold focus:outline-none focus:border-[#ffc800]" 
+                               className="w-full bg-[#020617] border border-white/10 pl-10 pr-4 py-3 text-xs font-bold focus:outline-none focus:border-[#ffc800] transition-colors" 
                             />
                          </div>
                     </div>
 
-                    <div className="col-span-2 pt-4">
-                        {status && <div className={`mb-4 text-[10px] font-black uppercase tracking-widest ${status.includes('❌') ? 'text-red-500' : 'text-green-500'}`}>{status}</div>}
+                    <div className="md:col-span-2 pt-4">
+                        {status && <div className={`mb-4 text-[9px] font-black uppercase tracking-widest ${status.includes('❌') ? 'text-red-500' : 'text-emerald-500'}`}>{status}</div>}
                         <button 
                             type="submit" 
                             disabled={isSubmitting || isUploading}
-                            className="w-full bg-[#ffc800] hover:bg-white text-black font-black uppercase tracking-widest text-[10px] py-4 transition-all"
+                            className="w-full bg-[#ffc800] hover:bg-white text-black font-black uppercase tracking-widest text-[10px] py-4 transition-all shadow-[0_5px_20px_rgba(255,200,0,0.15)] active:scale-[0.98]"
                         >
-                            {isSubmitting ? "SYNCING..." : isUploading ? "WAITING FOR IMAGE..." : isEditing ? "Update Machine Details" : "Provision New Vehicle"}
+                            {isSubmitting ? "SYNCING..." : isUploading ? "UPLOADING..." : isEditing ? "Update Machine Details" : "Provision New Vehicle"}
                         </button>
                     </div>
                 </form>
@@ -385,61 +386,57 @@ export default function AdminFleet() {
              <div className="space-y-6">
                 <div className="flex justify-between items-center">
                    <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-[#ffc800]">Fleet Inventory</h3>
-                   <span className="text-[9px] font-black uppercase bg-slate-800 px-3 py-1 rounded-full">{vehicles.length} Units</span>
+                   <span className="text-[9px] font-black uppercase bg-white/5 border border-white/5 px-3 py-1">{vehicles.length} Units</span>
                 </div>
 
-                <div className="bg-[#0f172a] border border-slate-800 overflow-hidden divide-y divide-slate-800 shadow-xl">
+                <div className="bg-[#0f172a] border border-white/5 overflow-hidden divide-y divide-white/5 shadow-xl">
                    {loading ? (
-                       <div className="p-12 text-center text-[10px] font-black uppercase text-slate-700 tracking-[0.5em]">Fetching Inventory Stream...</div>
+                       <div className="p-12 text-center text-[9px] font-black uppercase text-slate-700 tracking-[0.5em] animate-pulse">Loading Stream...</div>
                    ) : vehicles.length === 0 ? (
-                       <div className="p-12 text-center flex flex-col items-center gap-4">
-                           <BikeIcon className="w-8 h-8 text-slate-800" />
-                           <span className="text-[10px] font-black uppercase text-slate-600 tracking-widest">No vehicles found in fleet</span>
+                       <div className="p-12 text-center flex flex-col items-center gap-4 opacity-30">
+                           <BikeIcon className="w-10 h-10" />
+                           <span className="text-[9px] font-black uppercase tracking-widest">No machines detected</span>
                        </div>
                    ) : vehicles.map((v) => (
-                      <div key={v._id} className="p-6 hover:bg-white/[0.02] transition-colors group">
-                           <div className="flex gap-6">
-                              <div className="w-32 h-20 bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shrink-0">
-                                 <img src={v.image} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
+                      <div key={v._id} className="p-5 md:p-6 hover:bg-white/[0.02] transition-colors group">
+                           <div className="flex flex-col sm:flex-row gap-5 md:gap-6">
+                              <div className="w-full sm:w-32 h-40 sm:h-20 bg-slate-900 border border-white/5 rounded-none overflow-hidden shrink-0">
+                                 <img src={v.image} className="w-full h-full object-cover group-hover:scale-110 transition-all duration-700" />
                               </div>
-                              <div className="flex-1 space-y-1">
-                                 <div className="flex justify-between items-start">
-                                    <div className="text-sm font-black uppercase tracking-tight text-white group-hover:text-[#ffc800] transition-colors">{v.name}</div>
+                              <div className="flex-1 space-y-2">
+                                 <div className="flex justify-between items-start gap-4">
+                                    <div className="text-sm md:text-base font-black uppercase tracking-tight text-white group-hover:text-[#ffc800] transition-colors">{v.name}</div>
                                     <div className="flex gap-2">
-                                       <button 
-                                          onClick={() => toggleBikeVisibility(v._id, v.isActive)} 
-                                          className={`p-1.5 rounded transition-all ${v.isActive ? 'bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white' : 'bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white'}`}
-                                          title={v.isActive ? "Deactivate" : "Activate"}
-                                       >
-                                          {v.isActive ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Clock className="w-3.5 h-3.5" />}
-                                       </button>
-                                       <button onClick={() => startEdit(v)} className="p-1.5 bg-slate-800 hover:bg-blue-600 text-slate-400 hover:text-white rounded transition-all"><Edit2 className="w-3.5 h-3.5" /></button>
-                                       <button onClick={() => handleDelete(v._id)} className="p-1.5 bg-slate-800 hover:bg-red-600 text-slate-400 hover:text-white rounded transition-all"><Trash2 className="w-3.5 h-3.5" /></button>
+                                       <button onClick={() => startEdit(v)} className="p-2 border border-white/10 hover:bg-[#ffc800] hover:text-black transition-all"><Edit2 className="w-3.5 h-3.5" /></button>
+                                       <button onClick={() => handleDelete(v._id)} className="p-2 border border-white/10 hover:bg-red-500 hover:text-white transition-all"><Trash2 className="w-3.5 h-3.5" /></button>
                                     </div>
                                  </div>
-                                 <div className="flex items-center gap-3">
-                                    <span className="text-[9px] font-black text-slate-500 uppercase flex items-center gap-1">
+                                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                                    <span className="text-[8px] md:text-[9px] font-black text-slate-500 uppercase flex items-center gap-1">
                                        <Tag className="w-2.5 h-2.5" /> {v.category}
                                     </span>
-                                    <span className="text-[9px] font-black text-slate-500 uppercase flex items-center gap-1">
+                                    <span className="text-[8px] md:text-[9px] font-black text-slate-500 uppercase flex items-center gap-1">
                                        <Zap className="w-2.5 h-2.5" /> {v.cc} CC
                                     </span>
-                                    <span className="text-[9px] font-black text-slate-500 uppercase flex items-center gap-1">
+                                    <span className="text-[8px] md:text-[9px] font-black text-slate-500 uppercase flex items-center gap-1">
                                        <Hash className="w-2.5 h-2.5" /> {v.vehicleNumber}
                                     </span>
                                  </div>
-                                 <div className="pt-2 flex items-center gap-4">
-                                    <div className="text-[10px] font-black text-white">₹{v.pricePerDay} <span className="text-slate-600">/ Day</span></div>
-                                    <div className={`text-[9px] font-black uppercase px-2 py-0.5 rounded ${
-                                       v.status === 'AVAILABLE' ? 'bg-green-500/10 text-green-500' : 'bg-amber-500/10 text-amber-500'
+                                 <div className="pt-2 flex flex-wrap items-center gap-3 md:gap-4">
+                                    <div className="text-[10px] md:text-[11px] font-black text-[#ffc800]">₹{v.pricePerDay} <span className="text-slate-600">/ Day</span></div>
+                                    <div className={`text-[8px] md:text-[9px] font-black uppercase px-2 py-0.5 border ${
+                                       v.status === 'AVAILABLE' ? 'border-emerald-500/30 text-emerald-500 bg-emerald-500/5' : 'border-amber-500/30 text-amber-500 bg-amber-500/5'
                                     }`}>
                                        {v.status}
                                     </div>
-                                    <div className={`text-[9px] font-black uppercase px-2 py-0.5 rounded ${
-                                       v.isActive ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'
-                                    }`}>
-                                       {v.isActive ? 'ACTIVE' : 'DARK'}
-                                    </div>
+                                    <button 
+                                       onClick={() => toggleBikeVisibility(v._id, v.isActive)}
+                                       className={`text-[8px] md:text-[9px] font-black uppercase px-2 py-0.5 border transition-all ${
+                                         v.isActive ? 'border-blue-500/30 text-blue-500 bg-blue-500/5 hover:bg-blue-500 hover:text-white' : 'border-slate-700 text-slate-500 bg-slate-900 hover:bg-white hover:text-black'
+                                       }`}
+                                    >
+                                       {v.isActive ? 'ACTIVE' : 'OFFLINE'}
+                                    </button>
                                  </div>
                               </div>
                            </div>

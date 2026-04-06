@@ -67,3 +67,24 @@ export async function GET() {
     return NextResponse.json({ error: "Failed to fetch bookings" }, { status: 500 });
   }
 }
+
+export async function DELETE(req: Request) {
+  try {
+    await connectDB();
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+    
+    if (!id) {
+       return NextResponse.json({ error: "Missing required booking identity (id)" }, { status: 400 });
+    }
+
+    const deleted = await Booking.findByIdAndDelete(id);
+    if (!deleted) {
+       return NextResponse.json({ error: "Booking record not found in system manifest" }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: "Operational Record Purged Successfully", id }, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json({ error: "Internal Record Erasure Failure" }, { status: 500 });
+  }
+}
