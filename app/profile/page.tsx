@@ -24,11 +24,25 @@ export default function ProfilePage() {
       router.push("/auth/user");
       return;
     }
-    const parsedUser = JSON.parse(storedUser);
-    setUser(parsedUser);
     
-    // Attempt to refresh profile silently if an API exists, but for now we rely on stored data.
-    // If the data doesn't have aadhaarUrl, it will prompt upload.
+    const parsedUser = JSON.parse(storedUser);
+    const userId = parsedUser._id || parsedUser.id;
+    
+    // Set initial local state
+    setUser(parsedUser);
+
+    // Sync with DB for the latest KYC documents
+    try {
+      const res = await fetch(`/api/user/profile?userId=${userId}`);
+      if (res.ok) {
+        const dbUser = await res.json();
+        const mergedUser = { ...parsedUser, ...dbUser };
+        localStorage.setItem("user", JSON.stringify(mergedUser));
+        setUser(mergedUser);
+      }
+    } catch (e) {
+      console.error("Backend Registry Sync Failed:", e);
+    }
   };
 
   const handleDocumentUpload = async (e: React.ChangeEvent<HTMLInputElement>, doctype: "aadhaar" | "dl") => {
